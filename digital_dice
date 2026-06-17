@@ -1,0 +1,49 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity digital_dice is
+    Port (
+        clk : in STD_LOGIC; 
+        roll_btn : in STD_LOGIC; 
+        led : out STD_LOGIC_VECTOR(9 downto 0) 
+    );
+end digital_dice;
+architecture digital_dice_arch of digital_dice is
+    component debounce
+        Port (
+            clk : in STD_LOGIC;
+            btn : in STD_LOGIC;
+            btn_out : out STD_LOGIC
+        );
+    end component;
+    component lfsr
+        Port (
+            clk : in STD_LOGIC;
+            roll_enable : in STD_LOGIC;
+            random_number : out STD_LOGIC_VECTOR(2 downto 0)
+        );
+    end component;
+    component led_controller
+        Port (
+            dice_number : in integer range 1 to 6;
+            led_pattern : out STD_LOGIC_VECTOR(9 downto 0)
+        );
+    end component;    
+    signal roll_btn_ch : STD_LOGIC; 
+    signal random_bits : STD_LOGIC_VECTOR(2 downto 0); 
+    signal dice_number : integer range 1 to 6;
+begin
+    debounce_1 : debounce Port map (clk => clk, btn => roll_btn, btn_out => roll_btn_ch);
+    lfsr_1 : lfsr Port map (clk => clk, roll_enable => roll_btn_ch, random_number => random_bits);
+    process(random_bits)
+    begin
+        case random_bits is
+            when "000" => dice_number <= 1;
+            when "001" => dice_number <= 2;
+            when "010" => dice_number <= 3;
+            when "011" => dice_number <= 4;
+            when "100" => dice_number <= 5;
+            when others => dice_number <= 6;
+        end case;
+    end process;
+  led_controller_1 : led_controller Port map (dice_number => dice_number, led_pattern => led);
+end digital_dice_arch;
