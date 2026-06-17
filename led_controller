@@ -1,0 +1,25 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity led_controller is
+    Port (
+        dice_number : in integer range 1 to 6;
+        led_pattern : out STD_LOGIC_VECTOR(9 downto 0) 
+    );
+end led_controller;
+architecture led_controller_arch of led_controller is
+    type dice_pattern_array is array (1 to 6) of STD_LOGIC_VECTOR(6 downto 0);
+    constant dice_patterns : dice_pattern_array := (
+        "1000001", 
+        "0100010", 
+        "1100011", 
+        "0011100", 
+        "1010101", 
+        "0111110"  
+    );
+begin
+    process(dice_number)
+    begin
+        led_pattern(6 downto 0) <= dice_patterns(dice_number); 
+        led_pattern(9 downto 7) <= "000"; 
+    end process;
+end led_controller_arch;
